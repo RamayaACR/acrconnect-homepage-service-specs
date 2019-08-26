@@ -1,0 +1,308 @@
+swagger: '2.0'
+info:
+  version: v1
+  title: ACR Homepage Service
+  description: This component provides APIs to list all the ACR Connect Apps on a web page and register callback APIs for the apps to decide the visibiliy and format of app cards based on user token
+  
+paths:
+  /api/callbacks/{id}:
+    put:
+      tags:
+      - Configuration
+      summary: Put Callback
+      description: Adds or updates a callback
+      operationId: AddOrUpdateCallbackAsync
+      consumes:
+      - application/json-patch+json
+      - application/json
+      - text/json
+      - application/*+json
+      produces:
+      - text/plain
+      - application/json
+      - text/json
+      parameters:
+      - name: id
+        in: path
+        description: The public id of the callback
+        required: true
+        type: string
+        format: uuid
+        
+      - name: callback
+        in: body
+        description: The callback to add
+        
+        schema:
+          $ref: '#/definitions/ApiCallback'
+          
+      responses:
+        204:
+          description: Callback added successfully
+          
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+            
+          
+      
+    delete:
+      tags:
+      - Configuration
+      summary: Remove Callback
+      description: Removes a callback
+      operationId: RemoveCallbackAsync
+      consumes: []
+      produces: []
+      parameters:
+      - name: id
+        in: path
+        description: The public id of the callback
+        required: true
+        type: string
+        format: uuid
+        
+      responses:
+        200:
+          description: Success
+          
+        204:
+          description: Callback deleted successfully
+          
+      
+    
+  /internal/applications:
+    get:
+      tags:
+      - InternalApplication
+      summary: Get Applications
+      operationId: GetAsync
+      consumes: []
+      produces:
+      - text/plain
+      - application/json
+      - text/json
+      parameters: []
+      responses:
+        200:
+          description: Ok
+          schema:
+            $ref: '#/definitions/Application'
+            
+          
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+            
+          
+      
+    
+  /internal/version:
+    get:
+      tags:
+      - InternalVersion
+      summary: Get Version
+      operationId: Get
+      consumes: []
+      produces:
+      - text/plain
+      - application/json
+      - text/json
+      parameters: []
+      responses:
+        200:
+          description: Ok
+          schema:
+            $ref: '#/definitions/AppVersion'
+            
+          
+      
+    
+definitions:
+  ApiCallback:
+    description: Represents a Home Page subscription to the application callback API
+    type: object
+    properties:
+      publicId:
+        format: uuid
+        description: Gets or sets a public (canonical) ID of the API callback registration.
+        type: string
+        example: 0d8b0bbb-28cd-4a33-b944-797693fed33e
+        
+      applicationId:
+        description: Gets or sets ID of the UI application the callback corresponds to.
+        type: string
+        example: 1
+        
+      apiVersion:
+        
+        description: Gets or sets callback API version number which the application supports.
+        type: integer
+        example: 1
+        
+      apiType:
+        
+        description: >-
+          Gets or sets callback API type (e.g. visibility check, app details, etc.) - see AcrConnect.HomePage.Api.Contract.CallbackApiType.
+
+          0 = Visibility
+        enum:
+        - Visibility
+        type: integer
+        example: 0
+        
+      relativeCallbackUri:
+        description: Gets or sets an application URI to call to customize how the application is shown in Home Page. URI is relative to the base application API URI.
+        type: string
+        example: http://url
+        
+    
+  ProblemDetails:
+    type: object
+    properties:
+      type:
+        type: string
+        
+      title:
+        type: string
+        
+      status:
+        
+        type: integer
+        
+      detail:
+        type: string
+        
+      instance:
+        type: string
+        
+    additionalProperties:
+      type: object
+      
+    
+  Application:
+    type: object
+    properties:
+      id:
+        type: string
+        example: 1
+        
+      serviceType:
+        description: >2+
+
+
+        enum:
+        - service
+        - uI
+        type: string
+        
+      name:
+        type: string
+        example: Name
+        
+      description:
+        type: string
+        example: Description
+        
+      currentVersion:
+        type: string
+        example: 1.0.0
+        
+      vendor:
+        type: string
+        example: Vendor
+        
+      enabled:
+        type: boolean
+        example: true
+        
+      releaseDate:
+        type: string
+        example: 1.0.0
+        
+      logoUri:
+        type: string
+        example: http://logo.uri
+        
+      url:
+        type: string
+        example: http://url
+        
+    
+  AppVersion:
+    type: object
+    properties:
+      clrVersion:
+        $ref: '#/definitions/Version'
+        example: 1.0.0
+        
+      osVersion:
+        type: string
+        example: Unix 4.9.184.0
+        
+      currentVersion:
+        type: string
+        example: 1.0.0
+        
+      environment:
+        type: string
+        example: Environment name
+        
+      name:
+        type: string
+        example: Application name
+        
+      authenticationUri:
+        type: string
+        example: http://authentication.uri
+        
+      baseExternalUri:
+        type: string
+        example: http://base.uri
+        
+      logsPath:
+        type: string
+        example: /path/to/logs
+        
+      dockerized:
+        type: boolean
+        example: true
+        
+    
+  Version:
+    type: object
+    properties:
+      major:
+        
+        type: integer
+        readOnly: true
+        
+      minor:
+        
+        type: integer
+        readOnly: true
+        
+      build:
+        
+        type: integer
+        readOnly: true
+        
+      revision:
+        
+        type: integer
+        readOnly: true
+        
+      majorRevision:
+        
+        type: integer
+        readOnly: true
+        
+      minorRevision:
+        
+        type: integer
+        readOnly: true
+        
+    
+
